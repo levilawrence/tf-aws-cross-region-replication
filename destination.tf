@@ -61,26 +61,26 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side
 }
 
 # bucket replication config
-resource "aws_s3_bucket_replication_configuration" "dest_replication" {
-  # Must have bucket versioning enabled first
-  depends_on = [aws_s3_bucket_versioning.dest_destination]
+# resource "aws_s3_bucket_replication_configuration" "dest_replication" {
+#   # Must have bucket versioning enabled first
+#   depends_on = [aws_s3_bucket_versioning.dest_destination]
 
-  role   = aws_iam_role.replication.arn
-  bucket = aws_s3_bucket.destination.id
+#   role   = aws_iam_role.replication.arn
+#   bucket = aws_s3_bucket.destination.id
 
-  rule {
-    # prefix = ""
-    status = "Enabled"
+#   rule {
+#     # prefix = ""
+#     status = "Enabled"
 
-    destination {
-      bucket             = aws_s3_bucket.destination.arn
-    #   replica_kms_key_id = aws_kms_key.destination.arn
-    }
+#     destination {
+#       bucket             = aws_s3_bucket.destination.arn
+#     #   replica_kms_key_id = aws_kms_key.destination.arn
+#     }
 
-    source_selection_criteria {
-      sse_kms_encrypted_objects {
-        status = "Enabled"
-      }
-    }
-  }
-}
+#     source_selection_criteria {
+#       sse_kms_encrypted_objects {
+#         status = "Enabled"
+#       }
+#     }
+#   }
+# }
