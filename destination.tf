@@ -19,7 +19,6 @@ resource "aws_kms_alias" "destination" {
   target_key_id = aws_kms_key.destination.key_id
 }
 
-
 # ------------------------------------------------------------------------------
 # S3 destination bucket
 # ------------------------------------------------------------------------------
@@ -28,7 +27,7 @@ resource "aws_kms_alias" "destination" {
 resource "aws_s3_bucket" "destination" {
   provider      = aws.dest
   bucket_prefix = var.bucket_prefix
-    region        = var.dest_region
+  
 
   lifecycle {
     prevent_destroy = false
@@ -42,7 +41,7 @@ resource "aws_s3_bucket_acl" "destination" {
 }
 
 # enable versioning
-resource "aws_s3_bucket_versioning" "destination" {
+resource "aws_s3_bucket_versioning" "dest_destination" {
   bucket = aws_s3_bucket.destination.id
   versioning_configuration {
     status = "Enabled"
@@ -62,9 +61,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side
 }
 
 # bucket replication config
-resource "aws_s3_bucket_replication_configuration" "replication" {
+resource "aws_s3_bucket_replication_configuration" "dest_replication" {
   # Must have bucket versioning enabled first
-  depends_on = [aws_s3_bucket_versioning.destination]
+  depends_on = [aws_s3_bucket_versioning.dest_destination]
 
   role   = aws_iam_role.replication.arn
   bucket = aws_s3_bucket.destination.id
@@ -80,7 +79,7 @@ resource "aws_s3_bucket_replication_configuration" "replication" {
 
     source_selection_criteria {
       sse_kms_encrypted_objects {
-        enabled = "true"
+        status = "Enabled"
       }
     }
   }

@@ -7,11 +7,11 @@ variable "tags" {
 }
 
 variable "source_region" {
-  default = "eu-west-2"
+  default = "eu-west-1"
 }
 
 variable "dest_region" {
-  default = "eu-west-1"
+  default = "eu-west-2"
 }
 
 variable "bucket_prefix" {

@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "general-state-lock"
+    bucket         = "levis-bucket"
     key            = "s3-crr-project/terraform.state"
     region         = "eu-west-2"
-    dynamodb_table = "s3-crr"
+    dynamodb_table = "S3-CRR"
   }
 
   required_providers {
