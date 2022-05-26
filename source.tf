@@ -159,19 +159,27 @@ resource "aws_s3_bucket_replication_configuration" "source_replication" {
   bucket = aws_s3_bucket.source.id
 
   rule {
-    # prefix = ""
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
+    
+    delete_marker_replication {
+      status = "Enabled"
+    }
 
     destination {
-      bucket             = aws_s3_bucket.destination.arn
-      # replica_kms_key_id = aws_kms_key.destination.arn
+      bucket = aws_s3_bucket.destination.arn
       encryption_configuration {
-      replica_kms_key_id = aws_kms_key.destination.arn
+        replica_kms_key_id = aws_kms_key.destination.arn
       }
     }
 
     source_selection_criteria {
       sse_kms_encrypted_objects {
+        status = "Enabled"
+      }
+      replica_modifications {
         status = "Enabled"
       }
     }
@@ -180,13 +188,15 @@ resource "aws_s3_bucket_replication_configuration" "source_replication" {
 
 # enable acl
 resource "aws_s3_bucket_acl" "source" {
-  bucket = aws_s3_bucket.source.id
-  acl    = "private"
+  provider = aws.source
+  bucket   = aws_s3_bucket.source.id
+  acl      = "private"
 }
 
 # enable versioning
 resource "aws_s3_bucket_versioning" "source" {
-  bucket = aws_s3_bucket.source.id
+  provider = aws.source
+  bucket   = aws_s3_bucket.source.id
   versioning_configuration {
     status = "Enabled"
   }
@@ -194,7 +204,8 @@ resource "aws_s3_bucket_versioning" "source" {
 
 # enable server side encryption
 resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side_encryption_source" {
-  bucket = aws_s3_bucket.source.bucket
+  provider = aws.source
+  bucket   = aws_s3_bucket.source.bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -208,9 +219,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side
 # finally put something in the bucket to replicate
 # ------------------------------------------------------------------------------
 resource "aws_s3_object" "sample" {
-  key          = "sample.txt"
+  count        = 2
+  provider     = aws.source
+  key          = "sample${count.index}.txt"
   bucket       = aws_s3_bucket.source.id
-  source       = "${path.module}/sample.txt"
+  source       = "${path.module}/sample${count.index}.txt"
   content_type = "text/plain"
-  etag         = filemd5("${path.module}/sample.txt")
+  etag         = filemd5("${path.module}/sample${count.index}.txt")
+
+  depends_on = [aws_s3_bucket_replication_configuration.source_replication]
 }
