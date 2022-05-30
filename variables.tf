@@ -14,13 +14,14 @@ variable "dest_region" {
   default = "eu-west-2"
 }
 
-variable "bucket_prefix" {
-  default = "crr-example"
+variable "source_prefix" {
+  default = "crr-source"
+}
+
+variable "dest_prefix" {
+  default = "crr-dest"
 }
 
 variable "aws_region" {
   default = "eu-west-2"
 }
-
-# variable "aws_profile" {
-# }
