@@ -216,16 +216,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side
 }
 
 # ------------------------------------------------------------------------------
-# finally put something in the bucket to replicate
+# put something in the bucket to replicate
 # ------------------------------------------------------------------------------
 resource "aws_s3_object" "sample" {
   count        = 2
+
   provider     = aws.source
-  key          = "sample${count.index}.txt"
+  key          = "sample${count.index+1}.txt"
   bucket       = aws_s3_bucket.source.id
-  source       = "${path.module}/sample${count.index}.txt"
+  source       = "${path.module}/sample${count.index+1}.txt"
   content_type = "text/plain"
-  etag         = filemd5("${path.module}/sample${count.index}.txt")
+  etag         = filemd5("${path.module}/sample${count.index+1}.txt")
 
   depends_on = [aws_s3_bucket_replication_configuration.source_replication]
 }
