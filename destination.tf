@@ -26,12 +26,15 @@ resource "aws_kms_alias" "destination" {
 # create bucket
 resource "aws_s3_bucket" "destination" {
   provider      = aws.dest
-  bucket_prefix = var.bucket_prefix
+  bucket_prefix = var.dest_prefix
+  force_destroy = true
 
-
-  lifecycle {
-    prevent_destroy = false
-  }
+    tags = merge(
+    {
+      "Name" = "Destination Bucket"
+    },
+    var.tags,
+  )
 }
 
 # enable acl
@@ -59,28 +62,3 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side
     }
   }
 }
-
-# bucket replication config
-# resource "aws_s3_bucket_replication_configuration" "dest_replication" {
-#   # Must have bucket versioning enabled first
-#   depends_on = [aws_s3_bucket_versioning.dest_destination]
-
-#   role   = aws_iam_role.replication.arn
-#   bucket = aws_s3_bucket.destination.id
-
-#   rule {
-#     # prefix = ""
-#     status = "Enabled"
-
-#     destination {
-#       bucket             = aws_s3_bucket.destination.arn
-#     #   replica_kms_key_id = aws_kms_key.destination.arn
-#     }
-
-#     source_selection_criteria {
-#       sse_kms_encrypted_objects {
-#         status = "Enabled"
-#       }
-#     }
-#   }
-# }
