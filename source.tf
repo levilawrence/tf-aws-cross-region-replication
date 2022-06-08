@@ -54,7 +54,7 @@ resource "aws_s3_bucket_versioning" "source" {
 }
 
 # enable server side encryption
-resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side_encryption_source" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "source_server_side_encryption" {
   provider = aws.source
   bucket   = aws_s3_bucket.source.bucket
 
@@ -68,8 +68,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side
 
 # replication configuration
 resource "aws_s3_bucket_replication_configuration" "source_replication" {
-  provider = aws.source
-  depends_on = [aws_s3_bucket_versioning.source]   # Must have bucket versioning enabled first
+  provider   = aws.source
+  depends_on = [aws_s3_bucket_versioning.source] # Must have bucket versioning enabled first
 
   role   = aws_iam_role.replication.arn
   bucket = aws_s3_bucket.source.id
@@ -97,18 +97,30 @@ resource "aws_s3_bucket_replication_configuration" "source_replication" {
   }
 }
 
+# bucket logging
+resource "aws_s3_bucket_logging" "source_access_logging" {
+  provider = aws.source
+  bucket   = aws_s3_bucket.source.id
+
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = var.log_prefix
+}
+
 # ------------------------------------------------------------------------------
 # put something in the bucket to replicate
 # ------------------------------------------------------------------------------
-resource "aws_s3_object" "sample" {
-  count        = 2
+resource "aws_s3_object" "sample_upload" {
+  count = 2
 
   provider     = aws.source
-  key          = "sample${count.index+1}.txt"
+  key          = "sample${count.index + 1}.txt"
   bucket       = aws_s3_bucket.source.id
-  source       = "${path.module}/sample${count.index+1}.txt"
+  source       = "${path.module}/sample${count.index + 1}.txt"
   content_type = "text/plain"
-  etag         = filemd5("${path.module}/sample${count.index+1}.txt")
+  etag         = filemd5("${path.module}/sample${count.index + 1}.txt")
 
-  depends_on = [aws_s3_bucket_replication_configuration.source_replication]
+  depends_on = [
+    aws_s3_bucket_replication_configuration.source_replication,
+    aws_s3_bucket_lifecycle_configuration.source_delete_objects
+  ]
 }

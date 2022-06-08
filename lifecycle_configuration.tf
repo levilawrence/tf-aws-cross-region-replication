@@ -1,4 +1,4 @@
-resource "aws_s3_bucket_lifecycle_configuration" "delete_objects" {
+resource "aws_s3_bucket_lifecycle_configuration" "source_delete_objects" {
   provider = aws.source
   bucket   = aws_s3_bucket.source.id
 
