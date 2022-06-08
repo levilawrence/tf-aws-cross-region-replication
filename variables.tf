@@ -2,7 +2,6 @@ variable "tags" {
   default = {
     "owner"   = "levi"
     "project" = "s3-replication"
-    "client"  = "Internal"
   }
 }
 
@@ -15,13 +14,13 @@ variable "dest_region" {
 }
 
 variable "source_prefix" {
-  default = "crr-source"
+  default = "crr-source-"
 }
 
 variable "dest_prefix" {
-  default = "crr-dest"
+  default = "crr-dest-"
 }
 
-variable "aws_region" {
-  default = "eu-west-2"
+variable "log_prefix" {
+  default = "aws-logs-"
 }

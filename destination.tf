@@ -29,7 +29,7 @@ resource "aws_s3_bucket" "destination" {
   bucket_prefix = var.dest_prefix
   force_destroy = true
 
-    tags = merge(
+  tags = merge(
     {
       "Name" = "Destination Bucket"
     },
@@ -52,7 +52,7 @@ resource "aws_s3_bucket_versioning" "dest_destination" {
 }
 
 # enable server side encryption
-resource "aws_s3_bucket_server_side_encryption_configuration" "apply_server_side_encryption_dest" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "dest_server_side_encryption" {
   bucket = aws_s3_bucket.destination.bucket
 
   rule {
