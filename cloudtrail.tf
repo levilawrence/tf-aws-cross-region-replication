@@ -10,7 +10,7 @@ resource "aws_cloudtrail" "S3_cloudtrail" {
   s3_key_prefix                 = "cloudtrail"
   include_global_service_events = false
 
-  depends_on                    = [aws_s3_bucket_policy.log_bucket_policy]
+  depends_on = [aws_s3_bucket_policy.log_bucket_policy]
 
   event_selector {
     read_write_type           = "All"
@@ -41,8 +41,8 @@ resource "aws_s3_bucket" "log_bucket" {
 
 resource "aws_s3_bucket_policy" "log_bucket_policy" {
   provider = aws.source
-  bucket = aws_s3_bucket.log_bucket.id
-  policy = <<POLICY
+  bucket   = aws_s3_bucket.log_bucket.id
+  policy   = <<POLICY
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -76,15 +76,16 @@ POLICY
 
 # enable acl
 resource "aws_s3_bucket_acl" "log_bucket_acl" {
-  provider      = aws.source
-  bucket = aws_s3_bucket.log_bucket.id
-  acl    = "log-delivery-write"
+  provider = aws.source
+  bucket   = aws_s3_bucket.log_bucket.id
+  acl      = "log-delivery-write"
 }
 
 # enable versioning
 resource "aws_s3_bucket_versioning" "log_bucket" {
   provider = aws.source
-  bucket = aws_s3_bucket.log_bucket.id
+  bucket   = aws_s3_bucket.log_bucket.id
+
   versioning_configuration {
     status = "Enabled"
   }
@@ -93,11 +94,11 @@ resource "aws_s3_bucket_versioning" "log_bucket" {
 # enable server side encryption
 resource "aws_s3_bucket_server_side_encryption_configuration" "logging_server_side_encryption" {
   provider = aws.source
-  bucket = aws_s3_bucket.log_bucket.id
+  bucket   = aws_s3_bucket.log_bucket.id
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.source.arn
+      kms_master_key_id = module.s3_replication_source.kms_key_arn
       sse_algorithm     = "aws:kms"
     }
   }
@@ -106,7 +107,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "logging_server_si
 # bucket logging
 resource "aws_s3_bucket_logging" "access_logging" {
   provider = aws.source
-  bucket   = aws_s3_bucket.source.id
+  bucket   = module.s3_replication_source.bucket_id
 
   target_bucket = aws_s3_bucket.log_bucket.id
   target_prefix = var.log_prefix

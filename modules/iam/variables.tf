@@ -13,14 +13,23 @@ variable "dest_region" {
   default = "eu-west-2"
 }
 
-variable "source_prefix" {
-  default = "crr-source"
+variable "name_prefix" {
 }
 
-variable "dest_prefix" {
-  default = "crr-dest"
+variable "description" {
 }
 
-variable "log_prefix" {
-  default = "aws-logs"
+variable "policy" {
+}
+
+variable "assume_role_policy" {
+}
+
+variable "name" {
+}
+
+variable "roles" {
+}
+
+variable "policy_arn" {
 }
